@@ -14,12 +14,18 @@
 #include <cinttypes>
 #include <sys/socket.h>
 #include <netinet/ip.h>
+#include <unistd.h>
 
 /// BSD Socket abstractions for TCP and UDP transmitters and receivers
 class Socket {
 public:
   enum class type { UDP, TCP };
   static const int buflen_max = 9000;
+
+
+  void Close() { close(SocketFileDescriptor); }
+
+  ~Socket() { Close(); }
 
   class Endpoint {
   public:
@@ -97,6 +103,8 @@ public:
   UDPReceiver(Endpoint local) : Socket(Socket::type::UDP) {
     this->setLocalSocket(local.ipaddr, local.port);
   };
+
+  ~UDPReceiver() { this->Close(); }
 };
 
 /// UDP transmitter needs to specify both local and remote socket
